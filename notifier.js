@@ -43,57 +43,96 @@ function formatChange(change) {
 
 /**
  * Generate HTML email content from the report
- * @param {Object} report - Report object with date and changes
+ * @param {Object} report - Report object with date and plans
  * @returns {string} - HTML email content
  */
 function generateEmailHtml(report) {
-  const { date, changes } = report;
+  const { date, plans } = report;
   
-  const changesHtml = changes
-    .map((change) => {
-      const format = formatChange(change);
-      const priceDisplay = change.currentPrice
-        ? `$${change.currentPrice.toLocaleString()}`
+  // Generate HTML for each plan
+  const plansHtml = plans
+    .map((plan) => {
+      const priceRangeText = plan.priceRange
+        ? `$${plan.priceRange.min.toLocaleString()} - $${plan.priceRange.max.toLocaleString()}`
         : 'N/A';
-      const previousDisplay = change.previousPrice
-        ? `$${change.previousPrice.toLocaleString()}`
-        : '–';
+      
+      const unitsHtml = plan.units
+        .map((unit) => {
+          const format = formatChange(unit);
+          const unitLabel = unit.unitNumber || 'Unit';
+          const floorLabel = unit.floor ? ` (Floor ${unit.floor})` : '';
+          const priceDisplay = unit.currentPrice
+            ? `$${unit.currentPrice.toLocaleString()}`
+            : 'N/A';
+          const previousDisplay = unit.previousPrice
+            ? `$${unit.previousPrice.toLocaleString()}`
+            : '–';
+          
+          return `
+            <tr>
+              <td style="padding: 10px 16px; border-bottom: 1px solid #e5e7eb;">
+                <span style="font-weight: 500;">${unitLabel}</span>${floorLabel}
+                ${unit.availability && unit.availability !== 'Unknown' ? `<br><span style="color: #6b7280; font-size: 11px;">${unit.availability}</span>` : ''}
+              </td>
+              <td style="padding: 10px 16px; border-bottom: 1px solid #e5e7eb; text-align: right;">
+                <span style="font-size: 16px; font-weight: 600;">${priceDisplay}</span>
+                ${unit.previousPrice ? `<br><span style="color: #9ca3af; font-size: 11px;">was ${previousDisplay}</span>` : ''}
+              </td>
+              <td style="padding: 10px 16px; border-bottom: 1px solid #e5e7eb; text-align: center;">
+                <span style="display: inline-block; padding: 3px 10px; border-radius: 9999px; background-color: ${format.bgColor}; color: ${format.color}; font-size: 12px; font-weight: 500;">
+                  ${format.icon} ${format.text}
+                </span>
+              </td>
+            </tr>
+          `;
+        })
+        .join('');
       
       return `
-        <tr>
-          <td style="padding: 12px 16px; border-bottom: 1px solid #e5e7eb;">
-            <strong>${change.name}</strong>
-            ${change.availability ? `<br><span style="color: #6b7280; font-size: 12px;">${change.availability}</span>` : ''}
-          </td>
-          <td style="padding: 12px 16px; border-bottom: 1px solid #e5e7eb; text-align: right;">
-            <span style="font-size: 18px; font-weight: 600;">${priceDisplay}</span>
-            ${change.previousPrice ? `<br><span style="color: #9ca3af; font-size: 12px;">was ${previousDisplay}</span>` : ''}
-          </td>
-          <td style="padding: 12px 16px; border-bottom: 1px solid #e5e7eb; text-align: center;">
-            <span style="display: inline-block; padding: 4px 12px; border-radius: 9999px; background-color: ${format.bgColor}; color: ${format.color}; font-size: 13px; font-weight: 500;">
-              ${format.icon} ${format.text}
-            </span>
-          </td>
-        </tr>
+        <div style="margin-bottom: 24px;">
+          <div style="background-color: #f9fafb; padding: 12px 16px; border-left: 4px solid #3b82f6;">
+            <h2 style="margin: 0; font-size: 18px; font-weight: 600; color: #1f2937;">
+              ${plan.planName}
+            </h2>
+            <p style="margin: 4px 0 0 0; font-size: 13px; color: #6b7280;">
+              ${plan.totalUnits} unit${plan.totalUnits !== 1 ? 's' : ''} available • Price range: ${priceRangeText}
+            </p>
+          </div>
+          <table style="width: 100%; border-collapse: collapse; background-color: white;">
+            <thead>
+              <tr style="background-color: #f9fafb; border-bottom: 2px solid #e5e7eb;">
+                <th style="padding: 8px 16px; text-align: left; font-size: 11px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;">Unit</th>
+                <th style="padding: 8px 16px; text-align: right; font-size: 11px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;">Price</th>
+                <th style="padding: 8px 16px; text-align: center; font-size: 11px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${unitsHtml}
+            </tbody>
+          </table>
+        </div>
       `;
     })
     .join('');
   
-  // Count changes by type
+  // Count all unit changes across all plans
+  const allUnits = plans.flatMap(p => p.units);
   const summary = {
-    decreased: changes.filter((c) => c.status === 'decreased').length,
-    increased: changes.filter((c) => c.status === 'increased').length,
-    unchanged: changes.filter((c) => c.status === 'unchanged').length,
-    new: changes.filter((c) => c.status === 'new').length,
+    decreased: allUnits.filter((u) => u.status === 'decreased').length,
+    increased: allUnits.filter((u) => u.status === 'increased').length,
+    unchanged: allUnits.filter((u) => u.status === 'unchanged').length,
+    new: allUnits.filter((u) => u.status === 'new').length,
+    removed: allUnits.filter((u) => u.status === 'removed').length,
   };
   
   const summaryParts = [];
   if (summary.decreased > 0) summaryParts.push(`${summary.decreased} price drop${summary.decreased > 1 ? 's' : ''}`);
   if (summary.increased > 0) summaryParts.push(`${summary.increased} increase${summary.increased > 1 ? 's' : ''}`);
-  if (summary.new > 0) summaryParts.push(`${summary.new} new listing${summary.new > 1 ? 's' : ''}`);
+  if (summary.new > 0) summaryParts.push(`${summary.new} new unit${summary.new > 1 ? 's' : ''}`);
+  if (summary.removed > 0) summaryParts.push(`${summary.removed} removed`);
   if (summary.unchanged > 0) summaryParts.push(`${summary.unchanged} unchanged`);
   
-  const summaryText = summaryParts.length > 0 ? summaryParts.join(' • ') : 'No changes detected';
+  const summaryText = summaryParts.length > 0 ? summaryParts.join(' • ') : 'No units found';
   
   return `
     <!DOCTYPE html>
@@ -122,20 +161,9 @@ function generateEmailHtml(report) {
           </p>
         </div>
         
-        <!-- Table -->
-        <div style="background-color: white; border-radius: 0 0 12px 12px; overflow: hidden; border: 1px solid #e5e7eb; border-top: none;">
-          <table style="width: 100%; border-collapse: collapse;">
-            <thead>
-              <tr style="background-color: #f9fafb;">
-                <th style="padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;">Floor Plan</th>
-                <th style="padding: 12px 16px; text-align: right; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;">Price</th>
-                <th style="padding: 12px 16px; text-align: center; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${changesHtml}
-            </tbody>
-          </table>
+        <!-- Plans and Units -->
+        <div style="padding: 20px; background-color: white; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
+          ${plansHtml}
         </div>
         
         <!-- Footer -->
@@ -144,7 +172,7 @@ function generateEmailHtml(report) {
             View listings directly:
           </p>
           <p style="margin: 0; font-size: 12px;">
-            ${changes.map((c) => `<a href="${c.url}" style="color: #3b82f6; text-decoration: none;">${c.name}</a>`).join(' • ')}
+            ${plans.map((p) => `<a href="${p.url}" style="color: #3b82f6; text-decoration: none;">${p.planName}</a>`).join(' • ')}
           </p>
           <p style="margin: 16px 0 0 0; color: #d1d5db; font-size: 11px;">
             This report is generated automatically by Flats Rent Tracker
@@ -159,33 +187,45 @@ function generateEmailHtml(report) {
 
 /**
  * Generate plain text email content from the report
- * @param {Object} report - Report object with date and changes
+ * @param {Object} report - Report object with date and plans
  * @returns {string} - Plain text email content
  */
 function generateEmailText(report) {
-  const { date, changes } = report;
+  const { date, plans } = report;
   
   let text = `RENT PRICE REPORT - ${date}\n`;
   text += `CityLine Flats\n`;
-  text += '='.repeat(50) + '\n\n';
+  text += '='.repeat(70) + '\n\n';
   
-  for (const change of changes) {
-    const format = formatChange(change);
-    const priceDisplay = change.currentPrice
-      ? `$${change.currentPrice.toLocaleString()}`
+  for (const plan of plans) {
+    const priceRangeText = plan.priceRange
+      ? `$${plan.priceRange.min.toLocaleString()} - $${plan.priceRange.max.toLocaleString()}`
       : 'N/A';
     
-    text += `${change.name}\n`;
-    text += `  Price: ${priceDisplay}\n`;
-    text += `  Status: ${format.text}\n`;
-    if (change.availability) {
-      text += `  Availability: ${change.availability}\n`;
+    text += `${plan.planName}\n`;
+    text += `  URL: ${plan.url}\n`;
+    text += `  Total Units: ${plan.totalUnits}\n`;
+    text += `  Price Range: ${priceRangeText}\n`;
+    text += `  Units:\n`;
+    
+    for (const unit of plan.units) {
+      const format = formatChange(unit);
+      const unitLabel = unit.unitNumber || 'Unit';
+      const floorLabel = unit.floor ? ` (Floor ${unit.floor})` : '';
+      const priceDisplay = unit.currentPrice
+        ? `$${unit.currentPrice.toLocaleString()}`
+        : 'N/A';
+      
+      text += `    • ${unitLabel}${floorLabel}: ${priceDisplay} - ${format.text}\n`;
+      if (unit.availability && unit.availability !== 'Unknown') {
+        text += `      Available: ${unit.availability}\n`;
+      }
     }
-    text += `  URL: ${change.url}\n`;
+    
     text += '\n';
   }
   
-  text += '-'.repeat(50) + '\n';
+  text += '-'.repeat(70) + '\n';
   text += 'Generated by Flats Rent Tracker\n';
   
   return text;
@@ -241,24 +281,67 @@ export async function sendReport(report) {
 export function createTestReport() {
   return {
     date: new Date().toISOString().split('T')[0],
-    changes: [
+    plans: [
       {
-        name: 'Plan B',
+        planName: 'Plan B',
         url: 'https://citylineflats.com/apartments/?spaces_tab=plan-detail&detail=162036',
-        currentPrice: 1850,
-        previousPrice: 1900,
-        difference: -50,
-        status: 'decreased',
-        availability: 'Available Now',
+        totalUnits: 3,
+        priceRange: { min: 5010, max: 5114 },
+        units: [
+          {
+            unitNumber: '201',
+            floor: '2',
+            currentPrice: 5010,
+            previousPrice: 5100,
+            difference: -90,
+            status: 'decreased',
+            availability: 'Available Now',
+          },
+          {
+            unitNumber: '305',
+            floor: '3',
+            currentPrice: 5064,
+            previousPrice: 5064,
+            difference: 0,
+            status: 'unchanged',
+            availability: '01/25/2026',
+          },
+          {
+            unitNumber: '412',
+            floor: '4',
+            currentPrice: 5114,
+            previousPrice: null,
+            difference: 0,
+            status: 'new',
+            availability: 'Available Now',
+          },
+        ],
       },
       {
-        name: 'Plan C + Den',
+        planName: 'Plan C + Den',
         url: 'https://citylineflats.com/apartments/?spaces_tab=plan-detail&detail=162039',
-        currentPrice: 2100,
-        previousPrice: 2100,
-        difference: 0,
-        status: 'unchanged',
-        availability: '2 Units Available',
+        totalUnits: 2,
+        priceRange: { min: 5208, max: 5438 },
+        units: [
+          {
+            unitNumber: '503',
+            floor: '5',
+            currentPrice: 5208,
+            previousPrice: 5208,
+            difference: 0,
+            status: 'unchanged',
+            availability: '02/01/2026',
+          },
+          {
+            unitNumber: '607',
+            floor: '6',
+            currentPrice: 5438,
+            previousPrice: 5400,
+            difference: 38,
+            status: 'increased',
+            availability: 'Available Now',
+          },
+        ],
       },
     ],
   };

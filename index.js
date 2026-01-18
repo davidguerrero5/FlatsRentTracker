@@ -59,125 +59,157 @@ function getLastEntry(history) {
  * Compare current prices with previous prices and generate a change report
  * @param {Object} currentData - Today's scraped data
  * @param {Object|null} previousData - Previous entry from history
- * @returns {Object} - Report object with changes
+ * @returns {Object} - Report object with changes by plan
  */
 function comparePrices(currentData, previousData) {
-  const changes = [];
+  const planReports = [];
   
-  // Create a map of previous prices by plan name for easy lookup
-  const previousPrices = new Map();
+  // Create a map of previous plans by name for easy lookup
+  const previousPlans = new Map();
   if (previousData && previousData.plans) {
     for (const plan of previousData.plans) {
-      previousPrices.set(plan.name, plan);
+      previousPlans.set(plan.name, plan);
     }
   }
   
   // Compare each current plan with previous
   for (const currentPlan of currentData.plans) {
-    const previousPlan = previousPrices.get(currentPlan.name);
+    const previousPlan = previousPlans.get(currentPlan.name);
+    const unitChanges = [];
     
-    let status;
-    let previousPrice = null;
-    let difference = 0;
+    // Create map of previous units by a unique key (unit number + price)
+    const previousUnits = new Map();
+    if (previousPlan && previousPlan.units) {
+      for (const unit of previousPlan.units) {
+        const key = `${unit.unitNumber || 'unknown'}-${unit.floor || 'unknown'}`;
+        previousUnits.set(key, unit);
+      }
+    }
     
-    if (!previousPlan) {
-      // New listing (not seen before)
-      status = 'new';
-    } else if (currentPlan.price === null || previousPlan.price === null) {
-      // Can't compare if either price is missing
-      status = 'unchanged';
-      previousPrice = previousPlan.price;
-    } else {
-      previousPrice = previousPlan.price;
-      difference = currentPlan.price - previousPrice;
+    // Compare each current unit
+    for (const currentUnit of currentPlan.units || []) {
+      const unitKey = `${currentUnit.unitNumber || 'unknown'}-${currentUnit.floor || 'unknown'}`;
+      const previousUnit = previousUnits.get(unitKey);
       
-      if (difference < 0) {
-        status = 'decreased';
-      } else if (difference > 0) {
-        status = 'increased';
-      } else {
-        status = 'unchanged';
+      let status = 'new';
+      let previousPrice = null;
+      let difference = 0;
+      
+      if (previousUnit) {
+        previousPrice = previousUnit.price;
+        difference = currentUnit.price - previousPrice;
+        
+        if (difference < 0) {
+          status = 'decreased';
+        } else if (difference > 0) {
+          status = 'increased';
+        } else {
+          status = 'unchanged';
+        }
+      }
+      
+      unitChanges.push({
+        unitNumber: currentUnit.unitNumber,
+        floor: currentUnit.floor,
+        currentPrice: currentUnit.price,
+        previousPrice,
+        difference,
+        status,
+        availability: currentUnit.availability,
+      });
+    }
+    
+    // Check for units that were removed
+    if (previousPlan && previousPlan.units) {
+      const currentUnitKeys = new Set(
+        (currentPlan.units || []).map(u => `${u.unitNumber || 'unknown'}-${u.floor || 'unknown'}`)
+      );
+      
+      for (const prevUnit of previousPlan.units) {
+        const unitKey = `${prevUnit.unitNumber || 'unknown'}-${prevUnit.floor || 'unknown'}`;
+        if (!currentUnitKeys.has(unitKey)) {
+          unitChanges.push({
+            unitNumber: prevUnit.unitNumber,
+            floor: prevUnit.floor,
+            currentPrice: null,
+            previousPrice: prevUnit.price,
+            difference: 0,
+            status: 'removed',
+            availability: 'No longer available',
+          });
+        }
       }
     }
     
-    changes.push({
-      name: currentPlan.name,
+    planReports.push({
+      planName: currentPlan.name,
       url: currentPlan.url,
-      currentPrice: currentPlan.price,
-      previousPrice,
-      difference,
-      status,
-      availability: currentPlan.availability,
+      totalUnits: currentPlan.totalUnits,
+      priceRange: currentPlan.priceRange,
+      units: unitChanges,
     });
-  }
-  
-  // Check for plans that were in previous but not in current (removed listings)
-  if (previousData && previousData.plans) {
-    const currentNames = new Set(currentData.plans.map((p) => p.name));
-    for (const previousPlan of previousData.plans) {
-      if (!currentNames.has(previousPlan.name)) {
-        changes.push({
-          name: previousPlan.name,
-          url: previousPlan.url,
-          currentPrice: null,
-          previousPrice: previousPlan.price,
-          difference: 0,
-          status: 'removed',
-          availability: 'No longer listed',
-        });
-      }
-    }
   }
   
   return {
     date: currentData.date,
     timestamp: currentData.timestamp,
-    changes,
+    plans: planReports,
   };
 }
 
 /**
  * Print a summary of the report to console
- * @param {Object} report - Report object with changes
+ * @param {Object} report - Report object with plan reports
  */
 function printReportSummary(report) {
-  console.log('\n' + '='.repeat(60));
+  console.log('\n' + '='.repeat(70));
   console.log(`RENT PRICE REPORT - ${report.date}`);
-  console.log('='.repeat(60) + '\n');
+  console.log('='.repeat(70) + '\n');
   
-  for (const change of report.changes) {
-    const priceStr = change.currentPrice
-      ? `$${change.currentPrice.toLocaleString()}`
-      : 'N/A';
+  for (const planReport of report.plans) {
+    console.log(`${planReport.planName}`);
+    console.log(`  URL: ${planReport.url}`);
+    console.log(`  Total Units: ${planReport.totalUnits}`);
     
-    let statusStr;
-    switch (change.status) {
-      case 'decreased':
-        statusStr = `↓ DECREASED by $${Math.abs(change.difference).toLocaleString()}`;
-        break;
-      case 'increased':
-        statusStr = `↑ INCREASED by $${Math.abs(change.difference).toLocaleString()}`;
-        break;
-      case 'new':
-        statusStr = '★ NEW LISTING';
-        break;
-      case 'removed':
-        statusStr = '✕ REMOVED';
-        break;
-      default:
-        statusStr = '– No change';
+    if (planReport.priceRange) {
+      console.log(`  Price Range: $${planReport.priceRange.min.toLocaleString()} - $${planReport.priceRange.max.toLocaleString()}`);
     }
     
-    console.log(`${change.name}`);
-    console.log(`  Price: ${priceStr}`);
-    console.log(`  Status: ${statusStr}`);
-    if (change.availability) {
-      console.log(`  Availability: ${change.availability}`);
+    console.log('  Units:');
+    
+    for (const unit of planReport.units) {
+      const unitLabel = unit.unitNumber || 'Unknown';
+      const floorLabel = unit.floor ? ` (Floor ${unit.floor})` : '';
+      const priceStr = unit.currentPrice ? `$${unit.currentPrice.toLocaleString()}` : 'N/A';
+      
+      let statusStr;
+      switch (unit.status) {
+        case 'decreased':
+          statusStr = `↓ DECREASED by $${Math.abs(unit.difference).toLocaleString()}`;
+          break;
+        case 'increased':
+          statusStr = `↑ INCREASED by $${Math.abs(unit.difference).toLocaleString()}`;
+          break;
+        case 'new':
+          statusStr = '★ NEW';
+          break;
+        case 'removed':
+          statusStr = '✕ REMOVED';
+          break;
+        default:
+          statusStr = '– No change';
+      }
+      
+      console.log(`    • ${unitLabel}${floorLabel}: ${priceStr} - ${statusStr}`);
+      if (unit.availability && unit.availability !== 'Unknown') {
+        console.log(`      Available: ${unit.availability}`);
+      }
     }
+    
     console.log();
   }
   
-  console.log('='.repeat(60) + '\n');
+  console.log('='.repeat(70) + '\n');
 }
 
 /**

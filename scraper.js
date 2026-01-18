@@ -29,6 +29,68 @@ function extractPrice(text) {
 }
 
 /**
+ * Extract individual units from the page
+ * @param {import('playwright').Page} page - Playwright page instance
+ * @returns {Array} - Array of unit objects
+ */
+async function extractUnits(page) {
+  const units = [];
+  
+  // Try to find unit tables or lists
+  const unitRows = await page.$$('tr[data-unit], .unit-row, .available-unit, tbody tr');
+  
+  for (const row of unitRows) {
+    try {
+      const rowText = await row.textContent();
+      
+      // Skip header rows
+      if (/unit|apartment|floor|price|rent|available/i.test(rowText) && rowText.length < 50) {
+        continue;
+      }
+      
+      // Extract unit number
+      const unitMatch = rowText.match(/(?:Unit\s+)?([A-Z]?\d+[A-Z]?)/i);
+      const unitNumber = unitMatch ? unitMatch[1] : null;
+      
+      // Extract floor
+      const floorMatch = rowText.match(/(?:Floor\s+)?(\d+)(?:st|nd|rd|th)?/i);
+      const floor = floorMatch ? floorMatch[1] : null;
+      
+      // Extract price
+      const priceMatch = rowText.match(/\$[\d,]+/);
+      const price = priceMatch ? parseInt(priceMatch[0].replace(/[$,]/g, ''), 10) : null;
+      
+      // Extract availability date
+      let availability = 'Unknown';
+      if (/available now|immediate/i.test(rowText)) {
+        availability = 'Available Now';
+      } else {
+        const dateMatch = rowText.match(/(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}|\w+\s+\d{1,2},?\s+\d{4})/);
+        if (dateMatch) {
+          availability = dateMatch[1];
+        }
+      }
+      
+      // Only add if we found a price (main indicator of a valid unit)
+      if (price && price > 1000 && price < 20000) {
+        units.push({
+          unitNumber,
+          floor,
+          price,
+          priceFormatted: `$${price.toLocaleString()}`,
+          availability,
+        });
+      }
+    } catch (error) {
+      // Skip problematic rows
+      continue;
+    }
+  }
+  
+  return units;
+}
+
+/**
  * Scrape a single floor plan page for price and availability
  * @param {import('playwright').Page} page - Playwright page instance
  * @param {Object} plan - Plan object with name and url
@@ -44,106 +106,13 @@ async function scrapePlan(page, plan) {
     // Wait for the page to fully render
     await page.waitForTimeout(3000);
     
-    let price = null;
-    let availability = 'Unknown';
     let planName = plan.name;
+    let units = [];
     
-    // Try multiple selectors for price (apartment sites vary in structure)
-    const priceSelectors = [
-      '.price',
-      '.rent-price',
-      '.unit-price',
-      '[data-price]',
-      '.starting-at',
-      '.plan-price',
-      '.detail-price',
-      '.spaces-detail-price',
-      '.spaces-price',
-    ];
+    // Extract individual units from the page
+    units = await extractUnits(page);
     
-    // Try to find price using various selectors
-    for (const selector of priceSelectors) {
-      try {
-        const element = await page.$(selector);
-        if (element) {
-          const text = await element.textContent();
-          const extractedPrice = extractPrice(text);
-          if (extractedPrice) {
-            price = extractedPrice;
-            break;
-          }
-        }
-      } catch {
-        // Selector not found, continue to next
-      }
-    }
-    
-    // If no price found with specific selectors, search the page content
-    if (!price) {
-      const pageContent = await page.content();
-      
-      // Look for price patterns in the page
-      const pricePatterns = [
-        /Starting\s+(?:at\s+)?\$[\d,]+/gi,
-        /\$[\d,]+\s*(?:\/\s*mo|per\s+month|monthly)/gi,
-        /rent[:\s]+\$[\d,]+/gi,
-        /price[:\s]+\$[\d,]+/gi,
-      ];
-      
-      for (const pattern of pricePatterns) {
-        const match = pageContent.match(pattern);
-        if (match) {
-          const extractedPrice = extractPrice(match[0]);
-          if (extractedPrice && extractedPrice > 500 && extractedPrice < 10000) {
-            price = extractedPrice;
-            break;
-          }
-        }
-      }
-    }
-    
-    // Try to find availability information
-    const availabilitySelectors = [
-      '.availability',
-      '.available-units',
-      '.units-available',
-      '.move-in-date',
-      '.available-date',
-      '.spaces-availability',
-    ];
-    
-    for (const selector of availabilitySelectors) {
-      try {
-        const element = await page.$(selector);
-        if (element) {
-          const text = await element.textContent();
-          if (text && text.trim()) {
-            availability = text.trim();
-            break;
-          }
-        }
-      } catch {
-        // Selector not found, continue
-      }
-    }
-    
-    // Look for availability in page text if not found
-    if (availability === 'Unknown') {
-      const bodyText = await page.locator('body').textContent();
-      
-      // Check for common availability patterns
-      if (/available\s+now/i.test(bodyText)) {
-        availability = 'Available Now';
-      } else if (/no\s+units?\s+available/i.test(bodyText)) {
-        availability = 'No Units Available';
-      } else {
-        // Look for date patterns
-        const dateMatch = bodyText.match(/available\s+(\w+\s+\d{1,2}(?:,?\s+\d{4})?)/i);
-        if (dateMatch) {
-          availability = `Available ${dateMatch[1]}`;
-        }
-      }
-    }
+    console.log(`  Found ${units.length} units for ${plan.name}`);
     
     // Try to get the actual plan name from the page
     const nameSelectors = [
@@ -173,12 +142,42 @@ async function scrapePlan(page, plan) {
       }
     }
     
+    // If no units found, try to get at least a summary price
+    if (units.length === 0) {
+      const bodyText = await page.locator('body').textContent();
+      const priceMatches = bodyText.match(/\$[\d,]+/g);
+      
+      if (priceMatches) {
+        console.log(`  No structured units found, but found prices: ${priceMatches.slice(0, 5).join(', ')}`);
+        
+        // Extract unique prices that look like rents (between $1,000 and $20,000)
+        const validPrices = [...new Set(priceMatches)]
+          .map(p => parseInt(p.replace(/[$,]/g, ''), 10))
+          .filter(p => p > 1000 && p < 20000)
+          .sort((a, b) => a - b);
+        
+        // Create a unit entry for each unique price
+        validPrices.forEach((price, index) => {
+          units.push({
+            unitNumber: `Unit ${index + 1}`,
+            floor: null,
+            price,
+            priceFormatted: `$${price.toLocaleString()}`,
+            availability: 'Call for Details',
+          });
+        });
+      }
+    }
+    
     return {
       name: planName,
       url: plan.url,
-      price,
-      priceFormatted: price ? `$${price.toLocaleString()}` : 'N/A',
-      availability,
+      units,
+      totalUnits: units.length,
+      priceRange: units.length > 0 ? {
+        min: Math.min(...units.map(u => u.price)),
+        max: Math.max(...units.map(u => u.price)),
+      } : null,
       scrapedAt: new Date().toISOString(),
       success: true,
     };
@@ -187,9 +186,9 @@ async function scrapePlan(page, plan) {
     return {
       name: plan.name,
       url: plan.url,
-      price: null,
-      priceFormatted: 'N/A',
-      availability: 'Error',
+      units: [],
+      totalUnits: 0,
+      priceRange: null,
       scrapedAt: new Date().toISOString(),
       success: false,
       error: error.message,
