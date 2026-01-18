@@ -1,0 +1,59 @@
+====================================
+QUICK START - Rent Price Tracker
+====================================
+
+1. CREATE .env FILE
+-------------------
+Create a file named .env in the root directory with:
+
+RESEND_API_KEY=re_fJLV23XF_8mZzLcnfFjrAiPyohDbNHkSq
+RECIPIENT_EMAIL=dguerrero5296@gmail.com
+SENDER_EMAIL=onboarding@resend.dev
+
+
+2. INSTALL
+----------
+npm install
+npx playwright install chromium
+
+
+3. TEST SCRAPER
+---------------
+node test-scraper.js
+
+This will open a browser and show you what the scraper sees.
+
+
+4. RUN TRACKER
+--------------
+npm start
+
+
+5. GITHUB SECRETS (for automatic daily emails)
+-----------------------------------------------
+Go to: GitHub.com → Your Repo → Settings → Secrets and variables → Actions
+
+Add these 3 secrets:
+
+Name: RESEND_API_KEY
+Value: re_fJLV23XF_8mZzLcnfFjrAiPyohDbNHkSq
+
+Name: RECIPIENT_EMAIL
+Value: dguerrero5296@gmail.com
+
+Name: SENDER_EMAIL
+Value: onboarding@resend.dev
+
+
+6. TEST GITHUB ACTION
+---------------------
+Go to: Actions tab → Daily Rent Price Check → Run workflow
+
+
+TROUBLESHOOTING
+---------------
+- If timeout errors: Website may be slow, scraper now uses 60s timeout
+- If no prices found: Run test-scraper.js to see page content
+- If email fails: Check API key in Resend dashboard
+
+For more details, see SETUP.md
