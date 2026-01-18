@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { Resend } from 'resend';
 
 /**
@@ -60,7 +61,6 @@ function generateEmailHtml(report) {
         .map((unit) => {
           const format = formatChange(unit);
           const unitLabel = unit.unitNumber ? `Unit ${unit.unitNumber}` : 'Unit';
-          const floorLabel = unit.floor ? ` • Floor ${unit.floor}` : '';
           const priceDisplay = unit.currentPrice
             ? `$${unit.currentPrice.toLocaleString()}/mo`
             : 'N/A';
@@ -68,17 +68,14 @@ function generateEmailHtml(report) {
             ? `$${unit.previousPrice.toLocaleString()}`
             : '–';
           
-          // Format availability prominently
-          let availabilityHtml = '';
-          if (unit.availability && unit.availability !== 'Unknown' && unit.availability !== 'Call for Details') {
-            availabilityHtml = `<br><span style="display: inline-block; margin-top: 4px; padding: 2px 8px; background-color: #f0fdf4; color: #16a34a; border-radius: 4px; font-size: 11px; font-weight: 500;">📅 ${unit.availability}</span>`;
-          }
+          // Format availability prominently - always show it
+          const availabilityText = unit.availability || 'Unknown';
+          const availabilityHtml = `<div style="margin-top: 6px; padding: 4px 10px; background-color: #f0fdf4; color: #16a34a; border-radius: 4px; font-size: 12px; font-weight: 500; display: inline-block;">📅 ${availabilityText}</div>`;
           
           return `
             <tr>
               <td style="padding: 12px 16px; border-bottom: 1px solid #e5e7eb;">
-                <div style="font-weight: 600; font-size: 15px; color: #1f2937;">${unitLabel}</div>
-                <div style="font-size: 12px; color: #6b7280; margin-top: 2px;">${floorLabel || '&nbsp;'}</div>
+                <div style="font-weight: 600; font-size: 15px; color: #1f2937; margin-bottom: 4px;">${unitLabel}</div>
                 ${availabilityHtml}
               </td>
               <td style="padding: 12px 16px; border-bottom: 1px solid #e5e7eb; text-align: right; vertical-align: top;">

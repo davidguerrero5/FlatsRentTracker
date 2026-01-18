@@ -2,13 +2,21 @@
 QUICK START - Rent Price Tracker
 ====================================
 
-1. CREATE .env FILE
--------------------
-Create a file named .env in the root directory with:
+1. CREATE .env FILE (for local testing)
+----------------------------------------
+Run the setup script:
+
+./setup-env.sh
+
+Or manually create a file named .env with:
 
 RESEND_API_KEY=re_fJLV23XF_8mZzLcnfFjrAiPyohDbNHkSq
 RECIPIENT_EMAIL=dguerrero5296@gmail.com
 SENDER_EMAIL=onboarding@resend.dev
+
+NOTE: GitHub secrets are SEPARATE from local .env file!
+- .env file = for local testing (npm start, node notifier.js)
+- GitHub secrets = for automatic daily emails (GitHub Actions)
 
 
 2. INSTALL
