@@ -59,27 +59,34 @@ function generateEmailHtml(report) {
       const unitsHtml = plan.units
         .map((unit) => {
           const format = formatChange(unit);
-          const unitLabel = unit.unitNumber || 'Unit';
-          const floorLabel = unit.floor ? ` (Floor ${unit.floor})` : '';
+          const unitLabel = unit.unitNumber ? `Unit ${unit.unitNumber}` : 'Unit';
+          const floorLabel = unit.floor ? ` • Floor ${unit.floor}` : '';
           const priceDisplay = unit.currentPrice
-            ? `$${unit.currentPrice.toLocaleString()}`
+            ? `$${unit.currentPrice.toLocaleString()}/mo`
             : 'N/A';
           const previousDisplay = unit.previousPrice
             ? `$${unit.previousPrice.toLocaleString()}`
             : '–';
           
+          // Format availability prominently
+          let availabilityHtml = '';
+          if (unit.availability && unit.availability !== 'Unknown' && unit.availability !== 'Call for Details') {
+            availabilityHtml = `<br><span style="display: inline-block; margin-top: 4px; padding: 2px 8px; background-color: #f0fdf4; color: #16a34a; border-radius: 4px; font-size: 11px; font-weight: 500;">📅 ${unit.availability}</span>`;
+          }
+          
           return `
             <tr>
-              <td style="padding: 10px 16px; border-bottom: 1px solid #e5e7eb;">
-                <span style="font-weight: 500;">${unitLabel}</span>${floorLabel}
-                ${unit.availability && unit.availability !== 'Unknown' ? `<br><span style="color: #6b7280; font-size: 11px;">${unit.availability}</span>` : ''}
+              <td style="padding: 12px 16px; border-bottom: 1px solid #e5e7eb;">
+                <div style="font-weight: 600; font-size: 15px; color: #1f2937;">${unitLabel}</div>
+                <div style="font-size: 12px; color: #6b7280; margin-top: 2px;">${floorLabel || '&nbsp;'}</div>
+                ${availabilityHtml}
               </td>
-              <td style="padding: 10px 16px; border-bottom: 1px solid #e5e7eb; text-align: right;">
-                <span style="font-size: 16px; font-weight: 600;">${priceDisplay}</span>
-                ${unit.previousPrice ? `<br><span style="color: #9ca3af; font-size: 11px;">was ${previousDisplay}</span>` : ''}
+              <td style="padding: 12px 16px; border-bottom: 1px solid #e5e7eb; text-align: right; vertical-align: top;">
+                <span style="font-size: 18px; font-weight: 700; color: #1f2937;">${priceDisplay}</span>
+                ${unit.previousPrice ? `<br><span style="color: #9ca3af; font-size: 11px;">was ${previousDisplay}/mo</span>` : ''}
               </td>
-              <td style="padding: 10px 16px; border-bottom: 1px solid #e5e7eb; text-align: center;">
-                <span style="display: inline-block; padding: 3px 10px; border-radius: 9999px; background-color: ${format.bgColor}; color: ${format.color}; font-size: 12px; font-weight: 500;">
+              <td style="padding: 12px 16px; border-bottom: 1px solid #e5e7eb; text-align: center; vertical-align: top;">
+                <span style="display: inline-block; padding: 4px 12px; border-radius: 9999px; background-color: ${format.bgColor}; color: ${format.color}; font-size: 12px; font-weight: 500;">
                   ${format.icon} ${format.text}
                 </span>
               </td>
@@ -101,9 +108,9 @@ function generateEmailHtml(report) {
           <table style="width: 100%; border-collapse: collapse; background-color: white;">
             <thead>
               <tr style="background-color: #f9fafb; border-bottom: 2px solid #e5e7eb;">
-                <th style="padding: 8px 16px; text-align: left; font-size: 11px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;">Unit</th>
-                <th style="padding: 8px 16px; text-align: right; font-size: 11px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;">Price</th>
-                <th style="padding: 8px 16px; text-align: center; font-size: 11px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;">Status</th>
+                <th style="padding: 10px 16px; text-align: left; font-size: 11px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;">Unit & Availability</th>
+                <th style="padding: 10px 16px; text-align: right; font-size: 11px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;">Monthly Rent</th>
+                <th style="padding: 10px 16px; text-align: center; font-size: 11px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;">Change</th>
               </tr>
             </thead>
             <tbody>
@@ -289,8 +296,8 @@ export function createTestReport() {
         priceRange: { min: 5010, max: 5114 },
         units: [
           {
-            unitNumber: '201',
-            floor: '2',
+            unitNumber: '350-201',
+            floor: '3',
             currentPrice: 5010,
             previousPrice: 5100,
             difference: -90,
@@ -298,7 +305,7 @@ export function createTestReport() {
             availability: 'Available Now',
           },
           {
-            unitNumber: '305',
+            unitNumber: '345-305',
             floor: '3',
             currentPrice: 5064,
             previousPrice: 5064,
@@ -307,38 +314,47 @@ export function createTestReport() {
             availability: '01/25/2026',
           },
           {
-            unitNumber: '412',
+            unitNumber: '412-109',
             floor: '4',
             currentPrice: 5114,
             previousPrice: null,
             difference: 0,
             status: 'new',
-            availability: 'Available Now',
+            availability: '02/10/2026',
           },
         ],
       },
       {
         planName: 'Plan C + Den',
         url: 'https://citylineflats.com/apartments/?spaces_tab=plan-detail&detail=162039',
-        totalUnits: 2,
-        priceRange: { min: 5208, max: 5438 },
+        totalUnits: 3,
+        priceRange: { min: 5411, max: 5426 },
         units: [
           {
-            unitNumber: '503',
-            floor: '5',
-            currentPrice: 5208,
-            previousPrice: 5208,
+            unitNumber: '350-227',
+            floor: '3',
+            currentPrice: 5411,
+            previousPrice: null,
             difference: 0,
-            status: 'unchanged',
-            availability: '02/01/2026',
+            status: 'new',
+            availability: 'Available Now',
           },
           {
-            unitNumber: '607',
-            floor: '6',
-            currentPrice: 5438,
-            previousPrice: 5400,
-            difference: 38,
-            status: 'increased',
+            unitNumber: '345-222',
+            floor: '3',
+            currentPrice: 5426,
+            previousPrice: null,
+            difference: 0,
+            status: 'new',
+            availability: 'Available Now',
+          },
+          {
+            unitNumber: '345-208',
+            floor: '3',
+            currentPrice: 5426,
+            previousPrice: null,
+            difference: 0,
+            status: 'new',
             availability: 'Available Now',
           },
         ],
