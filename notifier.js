@@ -24,21 +24,28 @@ function formatChange(change) {
         icon: '↑',
         text: `Increased by $${Math.abs(difference).toLocaleString()}`,
       };
-    case 'new':
-      return {
-        color: '#2563eb', // blue
-        bgColor: '#dbeafe',
-        icon: '★',
-        text: 'New Listing',
-      };
-    case 'unchanged':
-    default:
-      return {
-        color: '#6b7280', // gray
-        bgColor: '#f3f4f6',
-        icon: '–',
-        text: 'No change',
-      };
+      case 'new':
+        return {
+          color: '#2563eb', // blue
+          bgColor: '#dbeafe',
+          icon: '★',
+          text: 'New Listing',
+        };
+      case 'removed':
+        return {
+          color: '#dc2626', // red
+          bgColor: '#fee2e2',
+          icon: '✕',
+          text: 'Removed',
+        };
+      case 'unchanged':
+      default:
+        return {
+          color: '#6b7280', // gray
+          bgColor: '#f3f4f6',
+          icon: '–',
+          text: 'No change',
+        };
   }
 }
 
@@ -68,21 +75,29 @@ function generateEmailHtml(report) {
             ? `$${unit.previousPrice.toLocaleString()}`
             : '–';
           
+          // Special styling for removed units
+          const isRemoved = unit.status === 'removed';
+          const textDecoration = isRemoved ? 'text-decoration: line-through;' : '';
+          const opacity = isRemoved ? 'opacity: 0.6;' : '';
+          const rowStyle = `padding: 12px 16px; border-bottom: 1px solid #e5e7eb; ${opacity}`;
+          
           // Format availability prominently - always show it
           const availabilityText = unit.availability || 'Unknown';
-          const availabilityHtml = `<div style="margin-top: 6px; padding: 4px 10px; background-color: #f0fdf4; color: #16a34a; border-radius: 4px; font-size: 12px; font-weight: 500; display: inline-block;">📅 ${availabilityText}</div>`;
+          const availabilityBgColor = isRemoved ? '#fee2e2' : '#f0fdf4';
+          const availabilityTextColor = isRemoved ? '#dc2626' : '#16a34a';
+          const availabilityHtml = `<div style="margin-top: 6px; padding: 4px 10px; background-color: ${availabilityBgColor}; color: ${availabilityTextColor}; border-radius: 4px; font-size: 12px; font-weight: 500; display: inline-block;">📅 ${availabilityText}</div>`;
           
           return `
             <tr>
-              <td style="padding: 12px 16px; border-bottom: 1px solid #e5e7eb;">
-                <div style="font-weight: 600; font-size: 15px; color: #1f2937; margin-bottom: 4px;">${unitLabel}</div>
+              <td style="${rowStyle}">
+                <div style="font-weight: 600; font-size: 15px; color: #1f2937; margin-bottom: 4px; ${textDecoration}">${unitLabel}</div>
                 ${availabilityHtml}
               </td>
-              <td style="padding: 12px 16px; border-bottom: 1px solid #e5e7eb; text-align: right; vertical-align: top;">
-                <span style="font-size: 18px; font-weight: 700; color: #1f2937;">${priceDisplay}</span>
-                ${unit.previousPrice ? `<br><span style="color: #9ca3af; font-size: 11px;">was ${previousDisplay}/mo</span>` : ''}
+              <td style="${rowStyle} text-align: right; vertical-align: top;">
+                <span style="font-size: 18px; font-weight: 700; color: #1f2937; ${textDecoration}">${priceDisplay}</span>
+                ${unit.previousPrice ? `<br><span style="color: #9ca3af; font-size: 11px; ${textDecoration}">was ${previousDisplay}/mo</span>` : ''}
               </td>
-              <td style="padding: 12px 16px; border-bottom: 1px solid #e5e7eb; text-align: center; vertical-align: top;">
+              <td style="${rowStyle} text-align: center; vertical-align: top;">
                 <span style="display: inline-block; padding: 4px 12px; border-radius: 9999px; background-color: ${format.bgColor}; color: ${format.color}; font-size: 12px; font-weight: 500;">
                   ${format.icon} ${format.text}
                 </span>
@@ -236,6 +251,43 @@ function generateEmailText(report) {
 }
 
 /**
+ * Analyze the report and generate a custom subject line based on changes
+ * @param {Object} report - Report object with date and plans
+ * @returns {string} - Custom subject line
+ */
+function generateSubjectLine(report) {
+  // Collect all units across all plans
+  const allUnits = report.plans.flatMap(p => p.units);
+  
+  // Count changes by type
+  const counts = {
+    new: allUnits.filter(u => u.status === 'new').length,
+    removed: allUnits.filter(u => u.status === 'removed').length,
+    increased: allUnits.filter(u => u.status === 'increased').length,
+    decreased: allUnits.filter(u => u.status === 'decreased').length,
+    unchanged: allUnits.filter(u => u.status === 'unchanged').length,
+  };
+  
+  const date = report.date;
+  
+  // Priority order: removed > new > price changes > no changes
+  if (counts.removed > 0) {
+    const plural = counts.removed > 1 ? 's' : '';
+    return `🚫 ${counts.removed} Listing${plural} Removed - ${date}`;
+  } else if (counts.new > 0) {
+    const plural = counts.new > 1 ? 's' : '';
+    return `✨ ${counts.new} New Listing${plural} Available - ${date}`;
+  } else if (counts.increased > 0 || counts.decreased > 0) {
+    const changes = [];
+    if (counts.decreased > 0) changes.push(`${counts.decreased} ↓`);
+    if (counts.increased > 0) changes.push(`${counts.increased} ↑`);
+    return `💰 Price Changes: ${changes.join(', ')} - ${date}`;
+  } else {
+    return `📊 No Changes - ${date}`;
+  }
+}
+
+/**
  * Send the price report via email using Resend
  * @param {Object} report - Report object with date and changes
  * @returns {Promise<Object>} - Result from Resend API
@@ -255,7 +307,8 @@ export async function sendReport(report) {
   
   const resend = new Resend(apiKey);
   
-  const subject = `🏠 Rent Report: ${report.date} - CityLine Flats`;
+  // Generate custom subject based on changes
+  const subject = generateSubjectLine(report);
   
   // Support multiple recipients - comma-separated string becomes array
   const recipients = recipientEmail.includes(',')
@@ -304,7 +357,7 @@ export function createTestReport() {
       {
         planName: 'Plan B',
         url: 'https://citylineflats.com/apartments/?spaces_tab=plan-detail&detail=162036',
-        totalUnits: 3,
+        totalUnits: 5,
         priceRange: { min: 5010, max: 5114 },
         units: [
           {
@@ -323,7 +376,7 @@ export function createTestReport() {
             previousPrice: 5064,
             difference: 0,
             status: 'unchanged',
-            availability: '01/25/2026',
+            availability: 'Feb 25',
           },
           {
             unitNumber: '412-109',
@@ -332,7 +385,25 @@ export function createTestReport() {
             previousPrice: null,
             difference: 0,
             status: 'new',
-            availability: '02/10/2026',
+            availability: 'Feb 10',
+          },
+          {
+            unitNumber: '320-415',
+            floor: '3',
+            currentPrice: 5200,
+            previousPrice: 5150,
+            difference: 50,
+            status: 'increased',
+            availability: 'Mar 1',
+          },
+          {
+            unitNumber: '340-212',
+            floor: '3',
+            currentPrice: null,
+            previousPrice: 5050,
+            difference: 0,
+            status: 'removed',
+            availability: 'No longer available',
           },
         ],
       },
@@ -355,18 +426,18 @@ export function createTestReport() {
             unitNumber: '345-222',
             floor: '3',
             currentPrice: 5426,
-            previousPrice: null,
+            previousPrice: 5426,
             difference: 0,
-            status: 'new',
+            status: 'unchanged',
             availability: 'Available Now',
           },
           {
             unitNumber: '345-208',
             floor: '3',
             currentPrice: 5426,
-            previousPrice: null,
-            difference: 0,
-            status: 'new',
+            previousPrice: 5400,
+            difference: 26,
+            status: 'increased',
             availability: 'Available Now',
           },
         ],
