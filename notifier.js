@@ -257,12 +257,17 @@ export async function sendReport(report) {
   
   const subject = `🏠 Rent Report: ${report.date} - CityLine Flats`;
   
-  console.log(`Sending email report to ${recipientEmail}...`);
+  // Support multiple recipients - comma-separated string becomes array
+  const recipients = recipientEmail.includes(',')
+    ? recipientEmail.split(',').map(e => e.trim())
+    : recipientEmail;
+  
+  console.log(`Sending email report to ${Array.isArray(recipients) ? recipients.join(', ') : recipients}...`);
   
   try {
     const result = await resend.emails.send({
       from: senderEmail,
-      to: recipientEmail,
+      to: recipients,
       subject,
       html: generateEmailHtml(report),
       text: generateEmailText(report),

@@ -16,15 +16,17 @@ Create a file called `.env` in the root directory with the following content:
 
 ```bash
 RESEND_API_KEY=re_fJLV23XF_8mZzLcnfFjrAiPyohDbNHkSq
-RECIPIENT_EMAIL=dguerrero5296@gmail.com
+RECIPIENT_EMAIL=dguerrero5296@gmail.com,taitran.tct@gmail.com
 SENDER_EMAIL=onboarding@resend.dev
 ```
+
+**Note:** You can add multiple email recipients by separating them with commas.
 
 **Option C: Export in terminal (temporary)**
 
 ```bash
 export RESEND_API_KEY=re_fJLV23XF_8mZzLcnfFjrAiPyohDbNHkSq
-export RECIPIENT_EMAIL=dguerrero5296@gmail.com
+export RECIPIENT_EMAIL="dguerrero5296@gmail.com,taitran.tct@gmail.com"
 export SENDER_EMAIL=onboarding@resend.dev
 ```
 
