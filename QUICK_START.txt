@@ -11,10 +11,11 @@ Run the setup script:
 Or manually create a file named .env with:
 
 RESEND_API_KEY=re_fJLV23XF_8mZzLcnfFjrAiPyohDbNHkSq
-RECIPIENT_EMAIL=dguerrero5296@gmail.com,taitran.tct@gmail.com
+RECIPIENT_EMAIL=dguerrero5296@gmail.com
 SENDER_EMAIL=onboarding@resend.dev
 
-TIP: You can add more recipients by separating emails with commas
+NOTE: Free sender only allows sending to your own email. 
+To send to others, verify a domain at resend.com/domains
 
 NOTE: GitHub secrets are SEPARATE from local .env file!
 - .env file = for local testing (npm start, node notifier.js)
@@ -49,7 +50,7 @@ Name: RESEND_API_KEY
 Value: re_fJLV23XF_8mZzLcnfFjrAiPyohDbNHkSq
 
 Name: RECIPIENT_EMAIL
-Value: dguerrero5296@gmail.com,taitran.tct@gmail.com
+Value: dguerrero5296@gmail.com
 
 Name: SENDER_EMAIL
 Value: onboarding@resend.dev

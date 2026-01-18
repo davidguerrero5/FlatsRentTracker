@@ -20,7 +20,7 @@ fi
 cat > .env << 'EOF'
 # Resend API Configuration for Local Testing
 RESEND_API_KEY=re_fJLV23XF_8mZzLcnfFjrAiPyohDbNHkSq
-RECIPIENT_EMAIL=dguerrero5296@gmail.com,taitran.tct@gmail.com
+RECIPIENT_EMAIL=dguerrero5296@gmail.com
 SENDER_EMAIL=onboarding@resend.dev
 EOF
 

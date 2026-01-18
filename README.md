@@ -64,7 +64,7 @@ For detailed setup and troubleshooting, see [SETUP.md](SETUP.md).
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `RESEND_API_KEY` | Yes | API key from your Resend dashboard |
-| `RECIPIENT_EMAIL` | Yes | Email address(es) to receive the daily reports (comma-separated for multiple: `email1@example.com,email2@example.com`) |
+| `RECIPIENT_EMAIL` | Yes | Email address to receive the daily reports. Note: with free sender (`onboarding@resend.dev`), you can only send to your own email. For multiple recipients, verify a domain at https://resend.com/domains |
 | `SENDER_EMAIL` | No | Verified sender email in Resend (defaults to `onboarding@resend.dev` for testing) |
 
 ## GitHub Actions Setup

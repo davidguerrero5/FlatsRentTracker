@@ -273,12 +273,22 @@ export async function sendReport(report) {
       text: generateEmailText(report),
     });
     
+    console.log('Resend API Response:', JSON.stringify(result, null, 2));
+    
+    if (result.error) {
+      console.error('Resend API Error:', result.error);
+      throw new Error(`Resend API Error: ${JSON.stringify(result.error)}`);
+    }
+    
     console.log('Email sent successfully!');
     console.log('Email ID:', result.data?.id || result.id);
     
     return result;
   } catch (error) {
     console.error('Failed to send email:', error.message);
+    if (error.response) {
+      console.error('API Response:', error.response);
+    }
     throw error;
   }
 }
