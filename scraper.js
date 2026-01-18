@@ -38,94 +38,128 @@ async function extractUnits(page) {
   
   try {
     // Wait for unit listings to load
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(2000);
     
-    // Look for unit cards or containers - these appear to be the main unit listings
-    // Based on the user's example, units have: unit number, price, availability, bed/bath, sq ft, plan name
-    const unitContainers = await page.$$('.unit-card, .apartment-card, .unit-item, .availability-item, .spaces-item, [data-unit-id]');
+    // Look for article elements with data-spaces-unit attribute (specific to this website)
+    const unitArticles = await page.$$('article[data-spaces-unit]');
     
-    console.log(`  Found ${unitContainers.length} potential unit containers`);
+    console.log(`  Found ${unitArticles.length} unit articles`);
     
-    for (const container of unitContainers) {
-      try {
-        const containerText = await container.textContent();
-        
-        // Must contain a unit number pattern like "Unit 350-227" or similar
-        const unitMatch = containerText.match(/Unit\s+(\d{3}-\d{3}|\d{3,4}[A-Z]?)/i);
-        if (!unitMatch) continue;
-        
-        const unitNumber = unitMatch[1];
-        
-        // Must contain a price (monthly rent)
-        const priceMatch = containerText.match(/\$[\d,]+\s*\/\s*mo/i);
-        if (!priceMatch) continue;
-        
-        const price = parseInt(priceMatch[0].replace(/[$,\/mo]/gi, '').trim(), 10);
-        
-        // Only valid rental prices
-        if (price < 1000 || price > 20000) continue;
-        
-        // Extract availability
-        let availability = 'Unknown';
-        if (/Avail\.\s*Now|Available\s*Now|Immediate/i.test(containerText)) {
-          availability = 'Available Now';
-        } else {
-          // Look for date patterns
-          const dateMatch = containerText.match(/Avail\.\s*(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})/i);
-          if (dateMatch) {
-            availability = dateMatch[1];
+    if (unitArticles.length > 0) {
+      // Use the structured data from article elements
+      for (const article of unitArticles) {
+        try {
+          // Get unit number from data attribute
+          const unitNumber = await article.getAttribute('data-spaces-unit');
+          if (!unitNumber) continue;
+          
+          // Get price from the .spaces-unit-price element
+          const priceElement = await article.$('.spaces-unit-price');
+          if (!priceElement) continue;
+          
+          const priceText = await priceElement.textContent();
+          const price = parseInt(priceText.replace(/[$,]/g, ''), 10);
+          
+          if (price < 1000 || price > 20000) continue;
+          
+          // Get availability date - prioritize the actual text display
+          let availability = 'Unknown';
+          
+          // First: check the availability text element (most accurate for "Available Now")
+          const availElement = await article.$('[data-spaces-control="unit-default-available-date"]');
+          if (availElement) {
+            const availText = await availElement.textContent();
+            
+            // Check if it says "Now" anywhere
+            if (/now/i.test(availText)) {
+              availability = 'Available Now';
+            } else {
+              // Extract the date part (e.g., "Avail.\n Feb 20" -> "Feb 20")
+              const dateMatch = availText.match(/([A-Z][a-z]+\s+\d{1,2})/);
+              if (dateMatch) {
+                availability = dateMatch[1];
+              }
+            }
           }
+          
+          // Fallback: if still unknown, try data-spaces-soonest attribute
+          if (availability === 'Unknown') {
+            const soonestDate = await article.getAttribute('data-spaces-soonest');
+            if (soonestDate) {
+              // Format: "2026-02-20" -> "Feb 20"
+              const date = new Date(soonestDate);
+              const month = date.toLocaleDateString('en-US', { month: 'short' });
+              const day = date.getDate();
+              availability = `${month} ${day}`;
+            }
+          }
+          
+          // Extract floor from unit number
+          const floorFromUnit = unitNumber.match(/^(\d)/);
+          const floor = floorFromUnit ? floorFromUnit[1] : null;
+          
+          units.push({
+            unitNumber,
+            floor,
+            price,
+            priceFormatted: `$${price.toLocaleString()}`,
+            availability,
+          });
+          
+          console.log(`    ✓ Unit ${unitNumber}: $${price} - ${availability}`);
+          
+        } catch (error) {
+          console.log(`    ✗ Error processing unit: ${error.message}`);
+          continue;
         }
-        
-        // Extract floor from unit number (e.g., Unit 350-227 -> floor 3, Unit 345-222 -> floor 3)
-        const floorFromUnit = unitNumber.match(/^(\d)/);
-        const floor = floorFromUnit ? floorFromUnit[1] : null;
-        
-        units.push({
-          unitNumber,
-          floor,
-          price,
-          priceFormatted: `$${price.toLocaleString()}`,
-          availability,
-        });
-        
-        console.log(`    ✓ Unit ${unitNumber}: $${price}`);
-        
-      } catch (error) {
-        continue;
       }
     }
     
-    // If no units found with the above method, try a more generic approach
+    // Fallback: if no articles found, try text-based extraction
     if (units.length === 0) {
-      console.log('  Trying alternative extraction method...');
+      console.log('  No article elements found, trying text-based extraction...');
       
-      // Get all text content
       const bodyText = await page.textContent('body');
-      
-      // Split into sections and look for unit patterns
-      // Pattern: "Unit XXX-XXX" followed by "$X,XXX /mo" within a reasonable distance
-      const unitPattern = /Unit\s+(\d{3}-\d{3}|\d{3,4}[A-Z]?)[\s\S]{0,500}?\$(\d{1,2},?\d{3})\s*\/\s*mo/gi;
+      const unitPattern = /Unit\s+(\d{3}-\d{3}|\d{3,4}[A-Z]?)([\s\S]{0,500}?)\$(\d{1,2},?\d{3})\s*\/\s*mo/gi;
       let match;
       
       while ((match = unitPattern.exec(bodyText)) !== null) {
         const unitNumber = match[1];
-        const priceStr = match[2];
+        const contextText = match[2];
+        const priceStr = match[3];
         const price = parseInt(priceStr.replace(/,/g, ''), 10);
         
         if (price >= 1000 && price <= 20000) {
-          // Check if we already have this unit
           if (!units.find(u => u.unitNumber === unitNumber)) {
             const floorFromUnit = unitNumber.match(/^(\d)/);
+            
+            let availability = 'Call for Details';
+            if (/Avail\.\s*Now|Available\s*Now/i.test(contextText)) {
+              availability = 'Available Now';
+            } else {
+              const datePatterns = [
+                /Avail\.\s*([A-Z][a-z]+\s+\d{1,2})/i,
+                /Avail\.\s*(\d{1,2}[\/\-]\d{1,2})/i,
+              ];
+              
+              for (const pattern of datePatterns) {
+                const dateMatch = contextText.match(pattern);
+                if (dateMatch) {
+                  availability = dateMatch[1];
+                  break;
+                }
+              }
+            }
+            
             units.push({
               unitNumber,
               floor: floorFromUnit ? floorFromUnit[1] : null,
               price,
               priceFormatted: `$${price.toLocaleString()}`,
-              availability: 'Call for Details',
+              availability,
             });
             
-            console.log(`    ✓ Unit ${unitNumber}: $${price}`);
+            console.log(`    ✓ Unit ${unitNumber}: $${price} - ${availability}`);
           }
         }
       }

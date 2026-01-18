@@ -27,25 +27,73 @@ async function testScrape() {
     console.log('\n--- Page Text (first 2000 chars) ---');
     console.log(bodyText.substring(0, 2000));
     
-    // Look for unit patterns
-    console.log('\n--- Looking for Unit Listings ---');
-    const unitPattern = /Unit\s+(\d{3}-\d{3}|\d{3,4}[A-Z]?)[\s\S]{0,500}?\$(\d{1,2},?\d{3})\s*\/\s*mo/gi;
+    // Look for structured unit data (article elements)
+    console.log('\n--- Looking for Structured Unit Data ---');
+    const unitArticles = await page.$$('article[data-spaces-unit]');
+    console.log(`Found ${unitArticles.length} article elements with data-spaces-unit`);
+    
+    if (unitArticles.length > 0) {
+      console.log('\nExtracting unit details:');
+      for (let i = 0; i < Math.min(5, unitArticles.length); i++) {
+        const article = unitArticles[i];
+        const unitNumber = await article.getAttribute('data-spaces-unit');
+        const soonestDate = await article.getAttribute('data-spaces-soonest');
+        
+        const priceElement = await article.$('.spaces-unit-price');
+        const priceText = priceElement ? await priceElement.textContent() : 'N/A';
+        
+        const availElement = await article.$('[data-spaces-control="unit-default-available-date"]');
+        const availText = availElement ? await availElement.textContent() : 'N/A';
+        
+        console.log(`\n  Unit ${unitNumber}:`);
+        console.log(`    Price: ${priceText.trim()}`);
+        console.log(`    data-spaces-soonest: ${soonestDate}`);
+        console.log(`    Availability text: ${availText.trim()}`);
+      }
+      
+      if (unitArticles.length > 5) {
+        console.log(`\n  ... and ${unitArticles.length - 5} more units`);
+      }
+    }
+    
+    // Also try text-based extraction
+    console.log('\n--- Text-Based Extraction (Fallback) ---');
+    const unitPattern = /Unit\s+(\d{3}-\d{3}|\d{3,4}[A-Z]?)([\s\S]{0,500}?)\$(\d{1,2},?\d{3})\s*\/\s*mo/gi;
     let match;
     const foundUnits = [];
     
-    while ((match = unitPattern.exec(bodyText)) !== null) {
+    while ((match = unitPattern.exec(bodyText)) !== null && foundUnits.length < 5) {
       const unitNumber = match[1];
-      const price = match[2];
-      foundUnits.push({ unitNumber, price: `$${price}` });
+      const contextText = match[2];
+      const price = match[3];
+      
+      // Extract availability
+      let availability = 'Unknown';
+      if (/Avail\.\s*Now|Available\s*Now/i.test(contextText)) {
+        availability = 'Available Now';
+      } else {
+        const datePatterns = [
+          /Avail\.\s*([A-Z][a-z]+\s+\d{1,2})/i,
+          /Avail\.\s*(\d{1,2}[\/\-]\d{1,2})/i,
+        ];
+        
+        for (const pattern of datePatterns) {
+          const dateMatch = contextText.match(pattern);
+          if (dateMatch) {
+            availability = dateMatch[1];
+            break;
+          }
+        }
+      }
+      
+      foundUnits.push({ unitNumber, price: `$${price}`, availability });
     }
     
     if (foundUnits.length > 0) {
-      console.log(`Found ${foundUnits.length} unit listings:`);
+      console.log(`Found ${foundUnits.length} units via text extraction:`);
       foundUnits.forEach(unit => {
-        console.log(`  - Unit ${unit.unitNumber}: ${unit.price}/mo`);
+        console.log(`  - Unit ${unit.unitNumber}: ${unit.price}/mo - ${unit.availability}`);
       });
-    } else {
-      console.log('No unit listings found with pattern "Unit XXX-XXX $X,XXX /mo"');
     }
     
     // Look for all prices

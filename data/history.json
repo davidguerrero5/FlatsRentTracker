@@ -1,7 +1,7 @@
 [
   {
     "date": "2026-01-18",
-    "timestamp": "2026-01-18T22:15:45.452Z",
+    "timestamp": "2026-01-18T22:29:26.526Z",
     "plans": [
       {
         "name": "Plan B",
@@ -12,49 +12,49 @@
             "floor": "3",
             "price": 5114,
             "priceFormatted": "$5,114",
-            "availability": "Call for Details"
+            "availability": "Available Now"
           },
           {
             "unitNumber": "350-218",
             "floor": "3",
             "price": 5064,
             "priceFormatted": "$5,064",
-            "availability": "Call for Details"
+            "availability": "Available Now"
           },
           {
             "unitNumber": "350-212",
             "floor": "3",
             "price": 5064,
             "priceFormatted": "$5,064",
-            "availability": "Call for Details"
+            "availability": "Available Now"
           },
           {
             "unitNumber": "320-215",
             "floor": "3",
             "price": 5438,
             "priceFormatted": "$5,438",
-            "availability": "Call for Details"
+            "availability": "Feb 14"
           },
           {
             "unitNumber": "320-416",
             "floor": "3",
             "price": 5035,
             "priceFormatted": "$5,035",
-            "availability": "Call for Details"
+            "availability": "Feb 20"
           },
           {
             "unitNumber": "320-516",
             "floor": "3",
             "price": 5208,
             "priceFormatted": "$5,208",
-            "availability": "Call for Details"
+            "availability": "Feb 26"
           },
           {
             "unitNumber": "345-320",
             "floor": "3",
             "price": 5010,
             "priceFormatted": "$5,010",
-            "availability": "Call for Details"
+            "availability": "Feb 26"
           }
         ],
         "totalUnits": 7,
@@ -62,7 +62,7 @@
           "min": 5010,
           "max": 5438
         },
-        "scrapedAt": "2026-01-18T22:15:40.904Z",
+        "scrapedAt": "2026-01-18T22:29:20.863Z",
         "success": true
       },
       {
@@ -74,21 +74,21 @@
             "floor": "3",
             "price": 5411,
             "priceFormatted": "$5,411",
-            "availability": "Call for Details"
+            "availability": "Available Now"
           },
           {
             "unitNumber": "345-222",
             "floor": "3",
             "price": 5426,
             "priceFormatted": "$5,426",
-            "availability": "Call for Details"
+            "availability": "Available Now"
           },
           {
             "unitNumber": "345-208",
             "floor": "3",
             "price": 5426,
             "priceFormatted": "$5,426",
-            "availability": "Call for Details"
+            "availability": "Available Now"
           }
         ],
         "totalUnits": 3,
@@ -96,211 +96,7 @@
           "min": 5411,
           "max": 5426
         },
-        "scrapedAt": "2026-01-18T22:15:45.411Z",
-        "success": true
-      }
-    ]
-  },
-  {
-    "date": "2026-01-18",
-    "timestamp": "2026-01-18T22:16:13.541Z",
-    "plans": [
-      {
-        "name": "Plan B",
-        "url": "https://citylineflats.com/apartments/?spaces_tab=plan-detail&detail=162036",
-        "units": [
-          {
-            "unitNumber": "320-504",
-            "floor": "3",
-            "price": 5114,
-            "priceFormatted": "$5,114",
-            "availability": "Call for Details"
-          },
-          {
-            "unitNumber": "350-218",
-            "floor": "3",
-            "price": 5064,
-            "priceFormatted": "$5,064",
-            "availability": "Call for Details"
-          },
-          {
-            "unitNumber": "350-212",
-            "floor": "3",
-            "price": 5064,
-            "priceFormatted": "$5,064",
-            "availability": "Call for Details"
-          },
-          {
-            "unitNumber": "320-215",
-            "floor": "3",
-            "price": 5438,
-            "priceFormatted": "$5,438",
-            "availability": "Call for Details"
-          },
-          {
-            "unitNumber": "320-416",
-            "floor": "3",
-            "price": 5035,
-            "priceFormatted": "$5,035",
-            "availability": "Call for Details"
-          },
-          {
-            "unitNumber": "320-516",
-            "floor": "3",
-            "price": 5208,
-            "priceFormatted": "$5,208",
-            "availability": "Call for Details"
-          },
-          {
-            "unitNumber": "345-320",
-            "floor": "3",
-            "price": 5010,
-            "priceFormatted": "$5,010",
-            "availability": "Call for Details"
-          }
-        ],
-        "totalUnits": 7,
-        "priceRange": {
-          "min": 5010,
-          "max": 5438
-        },
-        "scrapedAt": "2026-01-18T22:16:09.014Z",
-        "success": true
-      },
-      {
-        "name": "Plan C + Den",
-        "url": "https://citylineflats.com/apartments/?spaces_tab=plan-detail&detail=162039",
-        "units": [
-          {
-            "unitNumber": "350-227",
-            "floor": "3",
-            "price": 5411,
-            "priceFormatted": "$5,411",
-            "availability": "Call for Details"
-          },
-          {
-            "unitNumber": "345-222",
-            "floor": "3",
-            "price": 5426,
-            "priceFormatted": "$5,426",
-            "availability": "Call for Details"
-          },
-          {
-            "unitNumber": "345-208",
-            "floor": "3",
-            "price": 5426,
-            "priceFormatted": "$5,426",
-            "availability": "Call for Details"
-          }
-        ],
-        "totalUnits": 3,
-        "priceRange": {
-          "min": 5411,
-          "max": 5426
-        },
-        "scrapedAt": "2026-01-18T22:16:13.481Z",
-        "success": true
-      }
-    ]
-  },
-  {
-    "date": "2026-01-18",
-    "timestamp": "2026-01-18T22:20:09.828Z",
-    "plans": [
-      {
-        "name": "Plan B",
-        "url": "https://citylineflats.com/apartments/?spaces_tab=plan-detail&detail=162036",
-        "units": [
-          {
-            "unitNumber": "320-504",
-            "floor": "3",
-            "price": 5114,
-            "priceFormatted": "$5,114",
-            "availability": "Call for Details"
-          },
-          {
-            "unitNumber": "350-218",
-            "floor": "3",
-            "price": 5064,
-            "priceFormatted": "$5,064",
-            "availability": "Call for Details"
-          },
-          {
-            "unitNumber": "350-212",
-            "floor": "3",
-            "price": 5064,
-            "priceFormatted": "$5,064",
-            "availability": "Call for Details"
-          },
-          {
-            "unitNumber": "320-215",
-            "floor": "3",
-            "price": 5438,
-            "priceFormatted": "$5,438",
-            "availability": "Call for Details"
-          },
-          {
-            "unitNumber": "320-416",
-            "floor": "3",
-            "price": 5035,
-            "priceFormatted": "$5,035",
-            "availability": "Call for Details"
-          },
-          {
-            "unitNumber": "320-516",
-            "floor": "3",
-            "price": 5208,
-            "priceFormatted": "$5,208",
-            "availability": "Call for Details"
-          },
-          {
-            "unitNumber": "345-320",
-            "floor": "3",
-            "price": 5010,
-            "priceFormatted": "$5,010",
-            "availability": "Call for Details"
-          }
-        ],
-        "totalUnits": 7,
-        "priceRange": {
-          "min": 5010,
-          "max": 5438
-        },
-        "scrapedAt": "2026-01-18T22:20:05.222Z",
-        "success": true
-      },
-      {
-        "name": "Plan C + Den",
-        "url": "https://citylineflats.com/apartments/?spaces_tab=plan-detail&detail=162039",
-        "units": [
-          {
-            "unitNumber": "350-227",
-            "floor": "3",
-            "price": 5411,
-            "priceFormatted": "$5,411",
-            "availability": "Call for Details"
-          },
-          {
-            "unitNumber": "345-222",
-            "floor": "3",
-            "price": 5426,
-            "priceFormatted": "$5,426",
-            "availability": "Call for Details"
-          },
-          {
-            "unitNumber": "345-208",
-            "floor": "3",
-            "price": 5426,
-            "priceFormatted": "$5,426",
-            "availability": "Call for Details"
-          }
-        ],
-        "totalUnits": 3,
-        "priceRange": {
-          "min": 5411,
-          "max": 5426
-        },
-        "scrapedAt": "2026-01-18T22:20:09.771Z",
+        "scrapedAt": "2026-01-18T22:29:26.483Z",
         "success": true
       }
     ]
