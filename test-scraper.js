@@ -27,25 +27,42 @@ async function testScrape() {
     console.log('\n--- Page Text (first 2000 chars) ---');
     console.log(bodyText.substring(0, 2000));
     
-    // Look for price patterns
-    console.log('\n--- Looking for prices ---');
-    const priceMatches = bodyText.match(/\$[\d,]+/g);
-    if (priceMatches) {
-      console.log('Found prices:', priceMatches.slice(0, 10));
+    // Look for unit patterns
+    console.log('\n--- Looking for Unit Listings ---');
+    const unitPattern = /Unit\s+(\d{3}-\d{3}|\d{3,4}[A-Z]?)[\s\S]{0,500}?\$(\d{1,2},?\d{3})\s*\/\s*mo/gi;
+    let match;
+    const foundUnits = [];
+    
+    while ((match = unitPattern.exec(bodyText)) !== null) {
+      const unitNumber = match[1];
+      const price = match[2];
+      foundUnits.push({ unitNumber, price: `$${price}` });
     }
     
-    // Get page HTML structure
-    console.log('\n--- HTML Structure ---');
-    const html = await page.content();
+    if (foundUnits.length > 0) {
+      console.log(`Found ${foundUnits.length} unit listings:`);
+      foundUnits.forEach(unit => {
+        console.log(`  - Unit ${unit.unitNumber}: ${unit.price}/mo`);
+      });
+    } else {
+      console.log('No unit listings found with pattern "Unit XXX-XXX $X,XXX /mo"');
+    }
     
-    // Look for elements with common price class names
-    const selectors = ['.price', '.rent', '.starting', '[data-price]', '.amount'];
-    for (const selector of selectors) {
+    // Look for all prices
+    console.log('\n--- All Prices Found on Page ---');
+    const priceMatches = bodyText.match(/\$[\d,]+/g);
+    if (priceMatches) {
+      const uniquePrices = [...new Set(priceMatches)].slice(0, 15);
+      console.log('Unique prices (first 15):', uniquePrices.join(', '));
+    }
+    
+    // Look for unit containers
+    console.log('\n--- Looking for Unit Container Elements ---');
+    const containerSelectors = ['.unit-card', '.apartment-card', '.unit-item', '.availability-item', '.spaces-item', '[data-unit-id]'];
+    for (const selector of containerSelectors) {
       const elements = await page.$$(selector);
       if (elements.length > 0) {
         console.log(`Found ${elements.length} elements with selector: ${selector}`);
-        const text = await elements[0].textContent();
-        console.log(`  First element text: ${text}`);
       }
     }
     
