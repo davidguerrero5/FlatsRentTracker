@@ -158,6 +158,22 @@ function comparePrices(currentData, previousData) {
 }
 
 /**
+ * Check if the report contains any meaningful updates
+ * @param {Object} report - Report object with plan reports
+ * @returns {boolean} - True if there are new, removed, increased, or decreased units
+ */
+function hasUpdates(report) {
+  const allUnits = report.plans.flatMap(p => p.units);
+  const hasChanges = allUnits.some(unit => 
+    unit.status === 'new' || 
+    unit.status === 'removed' || 
+    unit.status === 'increased' || 
+    unit.status === 'decreased'
+  );
+  return hasChanges;
+}
+
+/**
  * Print a summary of the report to console
  * @param {Object} report - Report object with plan reports
  */
@@ -241,13 +257,42 @@ async function main() {
     // Print summary to console
     printReportSummary(report);
     
-    // Step 4: Send email notification
-    console.log('Step 4: Sending email report...');
-    try {
-      await sendReport(report);
-    } catch (error) {
-      console.error('Warning: Could not send email:', error.message);
-      console.log('Continuing to save history...');
+    // Step 4: Send email notification (conditional based on SEND_MODE)
+    console.log('Step 4: Checking if email should be sent...');
+    const sendMode = process.env.SEND_MODE || 'always';
+    const reportHasUpdates = hasUpdates(report);
+    
+    console.log(`Send mode: ${sendMode}`);
+    console.log(`Report has updates: ${reportHasUpdates}`);
+    
+    let shouldSendEmail = false;
+    
+    if (sendMode === 'always') {
+      console.log('Mode is "always" - sending email regardless of updates');
+      shouldSendEmail = true;
+    } else if (sendMode === 'conditional') {
+      if (reportHasUpdates) {
+        console.log('Mode is "conditional" and updates found - sending email');
+        shouldSendEmail = true;
+      } else {
+        console.log('Mode is "conditional" but no updates found - skipping email');
+        shouldSendEmail = false;
+      }
+    } else {
+      console.log(`Unknown send mode "${sendMode}" - defaulting to always send`);
+      shouldSendEmail = true;
+    }
+    
+    if (shouldSendEmail) {
+      console.log('Sending email report...');
+      try {
+        await sendReport(report);
+      } catch (error) {
+        console.error('Warning: Could not send email:', error.message);
+        console.log('Continuing to save history...');
+      }
+    } else {
+      console.log('Email sending skipped (no updates for conditional send)');
     }
     
     // Step 5: Save to history

@@ -1,9 +1,9 @@
-name: Daily Rent Price Check
+name: Check Prices - 12:05 PM PST
 
 on:
-  # Run every day at 8:00 AM UTC
+  # Run at 12:05 PM PST (8:05 PM UTC) - conditional send
   schedule:
-    - cron: '0 8 * * *'
+    - cron: '5 20 * * *'
   
   # Allow manual triggering from the Actions tab
   workflow_dispatch:
@@ -31,11 +31,12 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install chromium --with-deps
       
-      - name: Run price tracker
+      - name: Run price tracker (conditional send)
         env:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           RECIPIENT_EMAIL: ${{ secrets.RECIPIENT_EMAIL }}
           SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
+          SEND_MODE: conditional
         run: npm start
       
       - name: Commit updated history
@@ -43,5 +44,5 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add data/history.json
-          git diff --staged --quiet || git commit -m "Update price history - $(date -u +%Y-%m-%d)"
+          git diff --staged --quiet || git commit -m "Update price history - $(date -u +%Y-%m-%d) 12:05 PM PST"
           git push
