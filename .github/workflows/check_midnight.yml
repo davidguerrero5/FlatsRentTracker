@@ -1,9 +1,9 @@
-name: Check Prices - 12:05 AM PST
+name: Check Prices - 12:00 AM PST
 
 on:
-  # Run at 12:05 AM PST (8:05 AM UTC) - conditional send
+  # Run at 12:00 AM PST (8:00 AM UTC) - conditional send
   schedule:
-    - cron: '5 8 * * *'
+    - cron: '0 8 * * *'
   
   # Allow manual triggering from the Actions tab
   workflow_dispatch:
@@ -44,5 +44,5 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add data/history.json
-          git diff --staged --quiet || git commit -m "Update price history - $(date -u +%Y-%m-%d) 12:05 AM PST"
+          git diff --staged --quiet || git commit -m "Update price history - $(date -u +%Y-%m-%d) 12:00 AM PST"
           git push
