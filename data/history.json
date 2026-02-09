@@ -12397,5 +12397,135 @@
         "success": true
       }
     ]
+  },
+  {
+    "date": "2026-02-09",
+    "timestamp": "2026-02-09T00:39:45.075Z",
+    "plans": [
+      {
+        "name": "Plan B",
+        "url": "https://citylineflats.com/apartments/?spaces_tab=plan-detail&detail=162036",
+        "units": [
+          {
+            "unitNumber": "350-218",
+            "floor": "3",
+            "price": 5064,
+            "priceFormatted": "$5,064",
+            "availability": "Available Now"
+          },
+          {
+            "unitNumber": "345-302",
+            "floor": "3",
+            "price": 4933,
+            "priceFormatted": "$4,933",
+            "availability": "Available Now"
+          },
+          {
+            "unitNumber": "320-504",
+            "floor": "3",
+            "price": 5114,
+            "priceFormatted": "$5,114",
+            "availability": "Available Now"
+          },
+          {
+            "unitNumber": "320-215",
+            "floor": "3",
+            "price": 5438,
+            "priceFormatted": "$5,438",
+            "availability": "Feb 10"
+          },
+          {
+            "unitNumber": "320-416",
+            "floor": "3",
+            "price": 5035,
+            "priceFormatted": "$5,035",
+            "availability": "Feb 20"
+          },
+          {
+            "unitNumber": "320-516",
+            "floor": "3",
+            "price": 5208,
+            "priceFormatted": "$5,208",
+            "availability": "Feb 26"
+          },
+          {
+            "unitNumber": "345-320",
+            "floor": "3",
+            "price": 5010,
+            "priceFormatted": "$5,010",
+            "availability": "Feb 26"
+          },
+          {
+            "unitNumber": "350-420",
+            "floor": "3",
+            "price": 5129,
+            "priceFormatted": "$5,129",
+            "availability": "Mar 03"
+          },
+          {
+            "unitNumber": "320-515",
+            "floor": "3",
+            "price": 5134,
+            "priceFormatted": "$5,134",
+            "availability": "Mar 07"
+          },
+          {
+            "unitNumber": "350-317",
+            "floor": "3",
+            "price": 5164,
+            "priceFormatted": "$5,164",
+            "availability": "Mar 09"
+          },
+          {
+            "unitNumber": "350-228",
+            "floor": "3",
+            "price": 5324,
+            "priceFormatted": "$5,324",
+            "availability": "Mar 11"
+          }
+        ],
+        "totalUnits": 11,
+        "priceRange": {
+          "min": 4933,
+          "max": 5438
+        },
+        "scrapedAt": "2026-02-09T00:39:39.349Z",
+        "success": true
+      },
+      {
+        "name": "Plan C + Den",
+        "url": "https://citylineflats.com/apartments/?spaces_tab=plan-detail&detail=162039",
+        "units": [
+          {
+            "unitNumber": "350-227",
+            "floor": "3",
+            "price": 5411,
+            "priceFormatted": "$5,411",
+            "availability": "Available Now"
+          },
+          {
+            "unitNumber": "345-222",
+            "floor": "3",
+            "price": 5426,
+            "priceFormatted": "$5,426",
+            "availability": "Available Now"
+          },
+          {
+            "unitNumber": "345-208",
+            "floor": "3",
+            "price": 5426,
+            "priceFormatted": "$5,426",
+            "availability": "Available Now"
+          }
+        ],
+        "totalUnits": 3,
+        "priceRange": {
+          "min": 5411,
+          "max": 5426
+        },
+        "scrapedAt": "2026-02-09T00:39:45.039Z",
+        "success": true
+      }
+    ]
   }
 ]
