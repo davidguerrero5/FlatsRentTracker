@@ -31400,5 +31400,86 @@
         "success": true
       }
     ]
+  },
+  {
+    "date": "2026-03-10",
+    "timestamp": "2026-03-10T16:25:05.502Z",
+    "plans": [
+      {
+        "name": "Plan B",
+        "url": "https://citylineflats.com/apartments/?spaces_tab=plan-detail&detail=162036",
+        "units": [
+          {
+            "unitNumber": "350-218",
+            "floor": "3",
+            "price": 5187,
+            "priceFormatted": "$5,187",
+            "availability": "Available Now"
+          },
+          {
+            "unitNumber": "320-215",
+            "floor": "3",
+            "price": 5462,
+            "priceFormatted": "$5,462",
+            "availability": "Available Now"
+          },
+          {
+            "unitNumber": "350-420",
+            "floor": "3",
+            "price": 5253,
+            "priceFormatted": "$5,253",
+            "availability": "Available Now"
+          },
+          {
+            "unitNumber": "350-317",
+            "floor": "3",
+            "price": 5289,
+            "priceFormatted": "$5,289",
+            "availability": "Available Now"
+          },
+          {
+            "unitNumber": "350-228",
+            "floor": "3",
+            "price": 5452,
+            "priceFormatted": "$5,452",
+            "availability": "Mar 11"
+          }
+        ],
+        "totalUnits": 5,
+        "priceRange": {
+          "min": 5187,
+          "max": 5462
+        },
+        "scrapedAt": "2026-03-10T16:24:59.974Z",
+        "success": true
+      },
+      {
+        "name": "Plan C + Den",
+        "url": "https://citylineflats.com/apartments/?spaces_tab=plan-detail&detail=162039",
+        "units": [
+          {
+            "unitNumber": "350-227",
+            "floor": "3",
+            "price": 5872,
+            "priceFormatted": "$5,872",
+            "availability": "Available Now"
+          },
+          {
+            "unitNumber": "345-222",
+            "floor": "3",
+            "price": 5774,
+            "priceFormatted": "$5,774",
+            "availability": "Mar 15"
+          }
+        ],
+        "totalUnits": 2,
+        "priceRange": {
+          "min": 5774,
+          "max": 5872
+        },
+        "scrapedAt": "2026-03-10T16:25:05.475Z",
+        "success": true
+      }
+    ]
   }
 ]
