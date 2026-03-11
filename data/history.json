@@ -31643,5 +31643,93 @@
         "success": true
       }
     ]
+  },
+  {
+    "date": "2026-03-11",
+    "timestamp": "2026-03-11T04:30:16.834Z",
+    "plans": [
+      {
+        "name": "Plan B",
+        "url": "https://citylineflats.com/apartments/?spaces_tab=plan-detail&detail=162036",
+        "units": [
+          {
+            "unitNumber": "350-218",
+            "floor": "3",
+            "price": 5230,
+            "priceFormatted": "$5,230",
+            "availability": "Available Now"
+          },
+          {
+            "unitNumber": "320-215",
+            "floor": "3",
+            "price": 5504,
+            "priceFormatted": "$5,504",
+            "availability": "Available Now"
+          },
+          {
+            "unitNumber": "350-420",
+            "floor": "3",
+            "price": 5296,
+            "priceFormatted": "$5,296",
+            "availability": "Available Now"
+          },
+          {
+            "unitNumber": "350-317",
+            "floor": "3",
+            "price": 5332,
+            "priceFormatted": "$5,332",
+            "availability": "Available Now"
+          },
+          {
+            "unitNumber": "350-228",
+            "floor": "3",
+            "price": 5494,
+            "priceFormatted": "$5,494",
+            "availability": "Mar 11"
+          }
+        ],
+        "totalUnits": 5,
+        "priceRange": {
+          "min": 5230,
+          "max": 5504
+        },
+        "scrapedAt": "2026-03-11T04:30:11.137Z",
+        "success": true
+      },
+      {
+        "name": "Plan C + Den",
+        "url": "https://citylineflats.com/apartments/?spaces_tab=plan-detail&detail=162039",
+        "units": [
+          {
+            "unitNumber": "350-227",
+            "floor": "3",
+            "price": 5960,
+            "priceFormatted": "$5,960",
+            "availability": "Available Now"
+          },
+          {
+            "unitNumber": "345-222",
+            "floor": "3",
+            "price": 5897,
+            "priceFormatted": "$5,897",
+            "availability": "Mar 15"
+          },
+          {
+            "unitNumber": "350-308",
+            "floor": "3",
+            "price": 5664,
+            "priceFormatted": "$5,664",
+            "availability": "Apr 14"
+          }
+        ],
+        "totalUnits": 3,
+        "priceRange": {
+          "min": 5664,
+          "max": 5960
+        },
+        "scrapedAt": "2026-03-11T04:30:16.802Z",
+        "success": true
+      }
+    ]
   }
 ]
