@@ -12,6 +12,10 @@ const FLOOR_PLANS = [
     name: 'Plan C + Den',
     url: 'https://citylineflats.com/apartments/?spaces_tab=plan-detail&detail=162039',
   },
+  {
+    name: 'Plan D',
+    url: 'https://citylineflats.com/apartments/?spaces_tab=plan-detail&detail=162038',
+  },
 ];
 
 /**
