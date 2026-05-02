@@ -58012,5 +58012,81 @@
         "success": true
       }
     ]
+  },
+  {
+    "date": "2026-05-02",
+    "timestamp": "2026-05-02T00:51:33.626Z",
+    "plans": [
+      {
+        "name": "Plan B",
+        "url": "https://citylineflats.com/apartments/?spaces_tab=plan-detail&detail=162036",
+        "units": [
+          {
+            "unitNumber": "320-215",
+            "floor": "3",
+            "price": 5536,
+            "priceFormatted": "$5,536",
+            "availability": "Available Now"
+          },
+          {
+            "unitNumber": "350-317",
+            "floor": "3",
+            "price": 5366,
+            "priceFormatted": "$5,366",
+            "availability": "Available Now"
+          },
+          {
+            "unitNumber": "350-228",
+            "floor": "3",
+            "price": 5526,
+            "priceFormatted": "$5,526",
+            "availability": "Available Now"
+          }
+        ],
+        "totalUnits": 3,
+        "priceRange": {
+          "min": 5366,
+          "max": 5536
+        },
+        "scrapedAt": "2026-05-02T00:51:22.721Z",
+        "success": true
+      },
+      {
+        "name": "Plan C + Den",
+        "url": "https://citylineflats.com/apartments/?spaces_tab=plan-detail&detail=162039",
+        "units": [
+          {
+            "unitNumber": "350-308",
+            "floor": "3",
+            "price": 5720,
+            "priceFormatted": "$5,720",
+            "availability": "Available Now"
+          },
+          {
+            "unitNumber": "345-201",
+            "floor": "3",
+            "price": 5992,
+            "priceFormatted": "$5,992",
+            "availability": "Available Now"
+          }
+        ],
+        "totalUnits": 2,
+        "priceRange": {
+          "min": 5720,
+          "max": 5992
+        },
+        "scrapedAt": "2026-05-02T00:51:28.204Z",
+        "success": true
+      },
+      {
+        "name": "Plan D",
+        "url": "https://citylineflats.com/apartments/?spaces_tab=plan-detail&detail=162038",
+        "units": [],
+        "totalUnits": 0,
+        "priceRange": null,
+        "scrapedAt": "2026-05-02T00:51:33.590Z",
+        "success": true
+      }
+    ]
   }
 ]
