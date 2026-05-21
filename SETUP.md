@@ -15,7 +15,7 @@
 Create a file called `.env` in the root directory with the following content:
 
 ```bash
-RESEND_API_KEY=re_fJLV23XF_8mZzLcnfFjrAiPyohDbNHkSq
+RESEND_API_KEY=<placeholder>
 RECIPIENT_EMAIL=dguerrero5296@gmail.com
 SENDER_EMAIL=onboarding@resend.dev
 ```
@@ -25,7 +25,7 @@ SENDER_EMAIL=onboarding@resend.dev
 **Option C: Export in terminal (temporary)**
 
 ```bash
-export RESEND_API_KEY=re_fJLV23XF_8mZzLcnfFjrAiPyohDbNHkSq
+export RESEND_API_KEY=<placeholder>
 export RECIPIENT_EMAIL=dguerrero5296@gmail.com
 export SENDER_EMAIL=onboarding@resend.dev
 ```
