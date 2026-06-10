@@ -75379,5 +75379,41 @@
         "success": true
       }
     ]
+  },
+  {
+    "date": "2026-06-10",
+    "timestamp": "2026-06-10T05:29:33.622Z",
+    "plans": [
+      {
+        "name": "Plan B",
+        "url": "https://citylineflats.com/apartments/?spaces_tab=plan-detail&detail=162036",
+        "units": [],
+        "totalUnits": 0,
+        "priceRange": null,
+        "scrapedAt": "2026-06-10T05:27:33.591Z",
+        "success": false,
+        "error": "page.goto: Timeout 60000ms exceeded.\nCall log:\n  - navigating to \"https://citylineflats.com/apartments/?spaces_tab=plan-detail&detail=162036\", waiting until \"domcontentloaded\"\n"
+      },
+      {
+        "name": "Plan C + Den",
+        "url": "https://citylineflats.com/apartments/?spaces_tab=plan-detail&detail=162039",
+        "units": [],
+        "totalUnits": 0,
+        "priceRange": null,
+        "scrapedAt": "2026-06-10T05:28:33.592Z",
+        "success": false,
+        "error": "page.goto: Timeout 60000ms exceeded.\nCall log:\n  - navigating to \"https://citylineflats.com/apartments/?spaces_tab=plan-detail&detail=162039\", waiting until \"domcontentloaded\"\n"
+      },
+      {
+        "name": "Plan D",
+        "url": "https://citylineflats.com/apartments/?spaces_tab=plan-detail&detail=162038",
+        "units": [],
+        "totalUnits": 0,
+        "priceRange": null,
+        "scrapedAt": "2026-06-10T05:29:33.593Z",
+        "success": false,
+        "error": "page.goto: Timeout 60000ms exceeded.\nCall log:\n  - navigating to \"https://citylineflats.com/apartments/?spaces_tab=plan-detail&detail=162038\", waiting until \"domcontentloaded\"\n"
+      }
+    ]
   }
 ]
