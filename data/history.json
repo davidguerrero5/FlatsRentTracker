@@ -84468,5 +84468,49 @@
         "success": true
       }
     ]
+  },
+  {
+    "date": "2026-07-13",
+    "timestamp": "2026-07-13T09:04:36.602Z",
+    "plans": [
+      {
+        "name": "Plan B",
+        "url": "https://citylineflats.com/apartments/?spaces_tab=plan-detail&detail=162036",
+        "units": [],
+        "totalUnits": 0,
+        "priceRange": null,
+        "scrapedAt": "2026-07-13T09:04:25.125Z",
+        "success": true
+      },
+      {
+        "name": "Plan C + Den",
+        "url": "https://citylineflats.com/apartments/?spaces_tab=plan-detail&detail=162039",
+        "units": [
+          {
+            "unitNumber": "320-412",
+            "floor": "3",
+            "price": 5593,
+            "priceFormatted": "$5,593",
+            "availability": "Aug 08"
+          }
+        ],
+        "totalUnits": 1,
+        "priceRange": {
+          "min": 5593,
+          "max": 5593
+        },
+        "scrapedAt": "2026-07-13T09:04:30.953Z",
+        "success": true
+      },
+      {
+        "name": "Plan D",
+        "url": "https://citylineflats.com/apartments/?spaces_tab=plan-detail&detail=162038",
+        "units": [],
+        "totalUnits": 0,
+        "priceRange": null,
+        "scrapedAt": "2026-07-13T09:04:36.566Z",
+        "success": true
+      }
+    ]
   }
 ]
