@@ -118003,5 +118003,88 @@
         "success": true
       }
     ]
+  },
+  {
+    "date": "2026-09-30",
+    "timestamp": "2026-09-30T12:20:18.439Z",
+    "plans": [
+      {
+        "name": "Plan B",
+        "url": "https://citylineflats.com/apartments/?spaces_tab=plan-detail&detail=162036",
+        "units": [
+          {
+            "unitNumber": "350-512",
+            "floor": "3",
+            "price": 6020,
+            "priceFormatted": "$6,020",
+            "availability": "Oct 05"
+          },
+          {
+            "unitNumber": "350-528",
+            "floor": "3",
+            "price": 6030,
+            "priceFormatted": "$6,030",
+            "availability": "Oct 17"
+          },
+          {
+            "unitNumber": "350-520",
+            "floor": "3",
+            "price": 6090,
+            "priceFormatted": "$6,090",
+            "availability": "Oct 31"
+          },
+          {
+            "unitNumber": "350-204",
+            "floor": "3",
+            "price": 5935,
+            "priceFormatted": "$5,935",
+            "availability": "Nov 22"
+          },
+          {
+            "unitNumber": "350-410",
+            "floor": "3",
+            "price": 5897,
+            "priceFormatted": "$5,897",
+            "availability": "Dec 12"
+          }
+        ],
+        "totalUnits": 5,
+        "priceRange": {
+          "min": 5897,
+          "max": 6090
+        },
+        "scrapedAt": "2026-09-30T12:20:07.073Z",
+        "success": true
+      },
+      {
+        "name": "Plan C + Den",
+        "url": "https://citylineflats.com/apartments/?spaces_tab=plan-detail&detail=162039",
+        "units": [],
+        "totalUnits": 0,
+        "priceRange": null,
+        "scrapedAt": "2026-09-30T12:20:12.825Z",
+        "success": true
+      },
+      {
+        "name": "Plan D",
+        "url": "https://citylineflats.com/apartments/?spaces_tab=plan-detail&detail=162038",
+        "units": [
+          {
+            "unitNumber": "345-424",
+            "floor": "3",
+            "price": 7254,
+            "priceFormatted": "$7,254",
+            "availability": "Available Now"
+          }
+        ],
+        "totalUnits": 1,
+        "priceRange": {
+          "min": 7254,
+          "max": 7254
+        },
+        "scrapedAt": "2026-09-30T12:20:18.412Z",
+        "success": true
+      }
+    ]
   }
 ]
