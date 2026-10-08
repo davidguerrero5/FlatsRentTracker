@@ -121700,5 +121700,38 @@
         "success": true
       }
     ]
+  },
+  {
+    "date": "2026-10-08",
+    "timestamp": "2026-10-08T04:04:08.965Z",
+    "plans": [
+      {
+        "name": "Plan B",
+        "url": "https://citylineflats.com/apartments/?spaces_tab=plan-detail&detail=162036",
+        "units": [],
+        "totalUnits": 0,
+        "priceRange": null,
+        "scrapedAt": "2026-10-08T04:03:57.950Z",
+        "success": true
+      },
+      {
+        "name": "Plan C + Den",
+        "url": "https://citylineflats.com/apartments/?spaces_tab=plan-detail&detail=162039",
+        "units": [],
+        "totalUnits": 0,
+        "priceRange": null,
+        "scrapedAt": "2026-10-08T04:04:03.455Z",
+        "success": true
+      },
+      {
+        "name": "Plan D",
+        "url": "https://citylineflats.com/apartments/?spaces_tab=plan-detail&detail=162038",
+        "units": [],
+        "totalUnits": 0,
+        "priceRange": null,
+        "scrapedAt": "2026-10-08T04:04:08.913Z",
+        "success": true
+      }
+    ]
   }
 ]
